@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Day Matchullis <dsm6069@gmail.com>
+Date: Thu, 22 Oct 2026 16:44:53 -0600
+Subject: [PATCH] Remove unsupported architectures
+
+aerynOS does not currently have support for arm, aarch64, or riscv
+---
+ build_odin.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build_odin.sh b/build_odin.sh
+index ebf2804c6..51cf77bdb 100755
+--- a/build_odin.sh
++++ b/build_odin.sh
+@@ -125,7 +125,7 @@ NetBSD)
+ 	;;
+ Linux)
+ 	CXXFLAGS="$CXXFLAGS $($LLVM_CONFIG --cxxflags --ldflags)"
+-	LDFLAGS="$LDFLAGS -lstdc++ -ldl $($LLVM_CONFIG --libs core native passes arm aarch64 x86 webassembly riscv --system-libs --libfiles)"
++	LDFLAGS="$LDFLAGS -lstdc++ -ldl $($LLVM_CONFIG --libs core native passes x86 webassembly --system-libs --libfiles)"
+ 	# Copy libLLVM*.so into current directory for linking
+ 	# NOTE: This is needed by the Linux release pipeline!
+ 	# cp $(readlink -f $($LLVM_CONFIG --libfiles)) ./
+-- 
+2.56.0
+
