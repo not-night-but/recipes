@@ -1,0 +1,53 @@
+From 0c6dc64c20916270c0c254c80a22fe3d6650b0da Mon Sep 17 00:00:00 2001
+From: Day Matchullis <dsm6069@gmail.com>
+Date: Sun, 25 Oct 2026 12:38:14 -0600
+Subject: [PATCH] Use /usr/share/defaults/hosts if /etc/hosts doesn't exist
+
+---
+ core/net/dns.odin      |  2 +-
+ core/net/dns_unix.odin | 16 ++++++++++++++++
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/core/net/dns.odin b/core/net/dns.odin
+index 919b391cc..6e6516c55 100644
+--- a/core/net/dns.odin
++++ b/core/net/dns.odin
+@@ -48,7 +48,7 @@ when ODIN_OS == .Windows {
+ }
+ 
+ init_dns_configuration :: proc() {
+-	when ODIN_OS == .Windows {
++	when ODIN_OS == .Windows || ODIN_OS == .Linux {
+ 		_init_dns_configuration()
+ 	}
+ }
+diff --git a/core/net/dns_unix.odin b/core/net/dns_unix.odin
+index be95b8341..25792f272 100644
+--- a/core/net/dns_unix.odin
++++ b/core/net/dns_unix.odin
+@@ -19,6 +19,22 @@ package net
+ 		Feoramund:       FreeBSD platform code
+ */
+ import "core:strings"
++import "core:sync"
++import "core:os"
++
++@(private)
++_init_dns_configuration :: proc() {
++	sync.once_do(&dns_config_initialized, proc() {
++		if os.exists(dns_configuration.hosts_file) {
++			return
++		}
++
++		stateless_hosts_file := "/usr/share/defaults/hosts"
++		if os.exists(stateless_hosts_file) {
++			dns_configuration.hosts_file = stateless_hosts_file
++		}
++	})
++}
+ 
+ @(private)
+ _get_dns_records_os :: proc(hostname: string, type: DNS_Record_Type, allocator := context.allocator) -> (records: []DNS_Record, err: DNS_Error) {
+-- 
+2.56.0
+
