@@ -1,0 +1,41 @@
+From 951a3fd2ab45830d59b898108d6a423cd991360b Mon Sep 17 00:00:00 2001
+From: Day Matchullis <dsm6069@gmail.com>
+Date: Sun, 25 Oct 2026 17:33:31 -0600
+Subject: [PATCH] Expand remove_libraries_for_other_platforms script
+
+Remove a bunch of darwin libs and remove the arm64 raylib lib
+---
+ misc/remove_libraries_for_other_platforms.sh | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/misc/remove_libraries_for_other_platforms.sh b/misc/remove_libraries_for_other_platforms.sh
+index db2e33ccd..187434d9a 100755
+--- a/misc/remove_libraries_for_other_platforms.sh
++++ b/misc/remove_libraries_for_other_platforms.sh
+@@ -21,6 +21,15 @@ remove_windows_libraries() {
+ remove_macos_libraries() {
+ 	find . -type f -name '*.dylib' | xargs rm -f 
+ 	find . -type d -name '*macos*' | xargs rm -rf
++
++	find . -type f -name '*_darwin_*.a' | xargs rm -f
++	find . -type d -wholename '*stb/lib/darwin*' | xargs rm -rf
++	find . -type d -wholename '*box3d/lib/darwin*' | xargs rm -rf
++	find . -type d -wholename '*glfw/lib/darwin*' | xargs rm -rf
++}
++
++remove_arm64_libraries() {
++	find -type d -name '*linux-arm64*' | xargs rm -rf
+ }
+ 
+ remove_linux_libraries() {
+@@ -33,6 +42,7 @@ case $OS in
+ 		assert_vendor
+ 		remove_windows_libraries
+ 		remove_macos_libraries
++		remove_arm64_libraries
+ 		;;
+ 	Darwin)
+ 		assert_vendor
+-- 
+2.56.0
+
